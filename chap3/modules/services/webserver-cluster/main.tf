@@ -1,6 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
 
 terraform {
   backend "s3" {}
@@ -9,7 +6,7 @@ terraform {
 
 resource "aws_launch_configuration" "example" {
   image_id        = "ami-40d28157"
-  instance_type   = "t2.micro"
+  instance_type   = var.instance_type
   security_groups = [aws_security_group.instance.id]
   user_data       = data.template_file.user_data.rendered
 
@@ -20,7 +17,7 @@ resource "aws_launch_configuration" "example" {
 }
 
 resource "aws_security_group" "instance" {
-  name = "terraform_example-instance"
+  name = "${var.cluster_name}-instance"
 
   ingress {
     from_port   = var.server_port
@@ -41,18 +38,18 @@ resource "aws_autoscaling_group" "example" {
   load_balancers    = [aws_elb.example.name]
   health_check_type = "ELB"
 
-  min_size = 2
-  max_size = 10
+  min_size = var.min_size
+  max_size = var.max_size
 
   tag {
     key                 = "Name"
-    value               = "terraform-asg-example"
+    value               = var.cluster_name
     propagate_at_launch = true
   }
 }
 
 resource "aws_elb" "example" {
-  name               = "terraform-asg-example"
+  name               = "${var.cluster_name}"
   availability_zones = data.aws_availability_zones.all.names
   security_groups    = [aws_security_group.elb.id]
 
@@ -74,7 +71,7 @@ resource "aws_elb" "example" {
 }
 
 resource "aws_security_group" "elb" {
-  name = "terraform-example-elb"
+  name = "${var.cluster_name}-elb"
 
   ingress {
     from_port   = 80
@@ -99,8 +96,8 @@ data "terraform_remote_state" "db" {
 
 
   config = {
-    bucket = "terraform-up-and-running-ngkaboon"
-    key    = "stage/data-stores/mysql/terraform.tfstate"
+    bucket = "${var.db_remote_state_bucker}"
+    key    = "${var.db_remote_state_key}"
     region = "us-east-1"
   }
 }

@@ -8,5 +8,6 @@ terraform {
 
 module "mysql" {
   source       = "../../../modules/data-stores/mysql"
-  cluster_name = "webservers-prod"
+  cluster_name = "webservers_prod"
+  db_password  = var.db_password
 }
