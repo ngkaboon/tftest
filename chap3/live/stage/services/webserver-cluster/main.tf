@@ -7,7 +7,7 @@ terraform {
 }
 
 module "webserver_cluster" {
-  source = "../../../modules/services/webserver-cluster"
+  source = "git::git@github.com:ngkaboon/modules.git//services/webserver-cluster?ref=v0.0.1"
 
   cluster_name           = "webservers-stage"
   db_remote_state_bucket = "terraform-up-and-running-ngkaboon"
@@ -19,3 +19,12 @@ module "webserver_cluster" {
 
 }
 
+resource "aws_security_group_rule" "allow_testing_inbound" {
+  type              = "ingress"
+  security_group_id = module.webserver_cluster.elb_security_group_id
+
+  from_port   = 12345
+  to_port     = 12345
+  protocol    = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+}

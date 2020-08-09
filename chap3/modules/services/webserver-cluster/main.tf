@@ -60,12 +60,6 @@ resource "aws_elb" "example" {
     instance_protocol = "http"
   }
 
-  listener {
-    lb_port           = 12345
-    lb_protocol       = "http"
-    instance_port     = var.server_port
-    instance_protocol = "http"
-  }
 
   health_check {
     healthy_threshold   = 2

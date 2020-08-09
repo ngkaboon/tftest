@@ -7,7 +7,7 @@ terraform {
 }
 
 module "mysql" {
-  source       = "../../../modules/data-stores/mysql"
+  source       = "git::git@github.com:ngkaboon/modules.git//data-stores/mysql?ref=v0.0.2"
   cluster_name = "webservers_stage"
   db_password  = var.db_password
 }
