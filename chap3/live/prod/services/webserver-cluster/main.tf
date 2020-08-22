@@ -9,33 +9,17 @@ terraform {
 module "webserver_cluster" {
   source = "../../../../modules/services/webserver-cluster"
 
+  ami                    = "ami-40d28157"
+  server_text            = "Newer Server text"
   cluster_name           = "webservers-prod"
   db_remote_state_bucket = "terraform-up-and-running-ngkaboon"
   db_remote_state_key    = "prod/data-stores/mysql/terraform.tfstate"
 
-  instance_type = "t2.micro"
-  min_size      = 2
-  max_size      = 10
-}
+  instance_type      = "t2.micro"
+  min_size           = 2
+  max_size           = 10
+  enable_autoscaling = false
 
-resource "aws_autoscaling_schedule" "scale_out_during_business_hours" {
-  scheduled_action_name = "scale-out-during-business-hours"
-  min_size              = 2
-  max_size              = 10
-  desired_capacity      = 4
-  recurrence            = "15 14 * * *"
-
-  autoscaling_group_name = module.webserver_cluster.asg_name
-}
-
-resource "aws_autoscaling_schedule" "scale_in_at_night" {
-  scheduled_action_name = "scale-in-at-night"
-  min_size              = 2
-  max_size              = 10
-  desired_capacity      = 2
-  recurrence            = "30 14 * * *"
-
-  autoscaling_group_name = module.webserver_cluster.asg_name
 }
 
 
